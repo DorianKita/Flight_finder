@@ -13,6 +13,7 @@ class DataManager:
         self._username = os.environ['SHEETY_USERNAME']
         self._password = os.environ['SHEETY_PASSWORD']
         self.authorization = HTTPBasicAuth(username=self._username, password=self._password)
+        self.destination_data = {}
 
 
     def get_destination_data(self):
@@ -20,3 +21,15 @@ class DataManager:
         sheet_data = response.json()['prices']
         return sheet_data
 
+    def update_destination_data(self):
+        for city in self.destination_data:
+            new_data = {
+                'price': {
+                    'iataCode': city['iataCode']
+                }
+            }
+            response = requests.put(
+                url=f"{SHEETY_ENDPOINT}/{city['id']}",
+                json=new_data,
+                auth=self.authorization
+            )
